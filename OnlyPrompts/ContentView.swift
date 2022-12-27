@@ -10,81 +10,106 @@ import CoreData
 
 struct ContentView: View {
     @Environment(\.managedObjectContext) private var viewContext
-
-    @FetchRequest(
-        sortDescriptors: [NSSortDescriptor(keyPath: \Item.timestamp, ascending: true)],
-        animation: .default)
-    private var items: FetchedResults<Item>
-
+    @SwiftUI.Environment(\.presentationMode) private var presentationMode: Binding<PresentationMode>
+    @Environment(\.colorScheme) var colorScheme
+    @ObservedObject var viewModel: ShuffleViewModel
+    
+    @State var selectedItem: ArtPrompt? = nil
+    private let columnWidth: CGFloat = 150.0
+    private let cornerRadius: CGFloat = 10.0
+    private let mosaicSpacing: CGFloat = 10.0
+    
+    @ViewBuilder
     var body: some View {
-        NavigationView {
-            List {
-                ForEach(items) { item in
-                    NavigationLink {
-                        Text("Item at \(item.timestamp!, formatter: itemFormatter)")
-                    } label: {
-                        Text(item.timestamp!, formatter: itemFormatter)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            self.viewModel.shuffle()
+        }
+        
+        return ZStack {
+            ProgressView()
+                .opacity(cd_artPrompts.lists.count > 0 ? 0.0 : 1.0)
+            
+            GeometryReader { geo in
+                ScrollView {
+                    HStack(alignment: .top, spacing: mosaicSpacing) {
+                        ForEach((0..<Int(floor(geo.size.width / columnWidth))).reversed(), id: \.self) { c in
+                            LazyVStack(spacing: mosaicSpacing) {
+                                ForEach(getPromptsInColumns(by: Int(floor(geo.size.width / columnWidth)))[c]) { prompt in
+                                    AsyncImage(url: prompt.imageURL) { phase in
+                                        if let image = phase.image {
+                                            image
+                                                .resizable()
+                                                .scaledToFit()
+                                                .cornerRadius(cornerRadius)
+                                        } else if phase.error != nil {
+                                            ZStack {
+                                                Color.black
+                                                    .frame(height: columnWidth)
+                                                    .cornerRadius(cornerRadius)
+                                                Image(systemName: "exclamationmark.arrow.triangle.2.circlepath")
+                                                    .resizable()
+                                                    .scaledToFit()
+                                                    .frame(width: 30.0)
+                                                    .foregroundColor(.red)
+                                            }
+                                        } else {
+                                            ZStack {
+                                                Color.black
+                                                    .frame(height: columnWidth)
+                                                    .cornerRadius(cornerRadius)
+                                                ProgressView()
+                                            }
+                                        }
+                                    }
+                                    .onTapGesture {
+                                        selectedItem = prompt
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    .padding()
+                    .sheet(item: $selectedItem) { item in
+                        VStack {
+                            HStack {
+                                CloseButton()
+                                    .padding(16.0)
+                                    .onTapGesture {
+                                        withAnimation(.spring()) {
+                                            selectedItem = nil
+                                        }
+                                    }
+                                Spacer()
+                            }
+                            ImagePromptDetailView(action: { print("Placeholder action: navigate to new poem") }, artPrompt: item)
+                            #if os(macOS)
+                                .frame(width: (NSScreen.main?.visibleFrame.width ?? 1024.0) - 100.0, height: (NSScreen.main?.visibleFrame.height ?? 1024.0) - 100.0)
+                            #endif
+                            .background(colorScheme == .dark ? Color(hex: 0x000000, opacity: 0.3) : Color(hex: 0xFFFFFF, opacity: 0.3))
+                        }
+                    }
+                    .navigationTitle("Visual Prompts")
+                }
+            }
+        }
+    }
+    
+    func getPromptsInColumns(by column: Int) -> [[ArtPrompt]] {
+        var result: [[ArtPrompt]] = []
+        
+        for i in 0..<column {
+            var list: [ArtPrompt] = []
+            cd_artPrompts.lists.forEach { prompt in
+                let index = cd_artPrompts.lists.firstIndex { $0.id == prompt.id }
+                
+                if let index = index {
+                    if (index+1) % column == i {
+                        list.append(prompt)
                     }
                 }
-                .onDelete(perform: deleteItems)
             }
-            .toolbar {
-#if os(iOS)
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    EditButton()
-                }
-#endif
-                ToolbarItem {
-                    Button(action: addItem) {
-                        Label("Add Item", systemImage: "plus")
-                    }
-                }
-            }
-            Text("Select an item")
+            result.append(list)
         }
-    }
-
-    private func addItem() {
-        withAnimation {
-            let newItem = Item(context: viewContext)
-            newItem.timestamp = Date()
-
-            do {
-                try viewContext.save()
-            } catch {
-                // Replace this implementation with code to handle the error appropriately.
-                // fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
-                let nsError = error as NSError
-                fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
-            }
-        }
-    }
-
-    private func deleteItems(offsets: IndexSet) {
-        withAnimation {
-            offsets.map { items[$0] }.forEach(viewContext.delete)
-
-            do {
-                try viewContext.save()
-            } catch {
-                // Replace this implementation with code to handle the error appropriately.
-                // fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
-                let nsError = error as NSError
-                fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
-            }
-        }
-    }
-}
-
-private let itemFormatter: DateFormatter = {
-    let formatter = DateFormatter()
-    formatter.dateStyle = .short
-    formatter.timeStyle = .medium
-    return formatter
-}()
-
-struct ContentView_Previews: PreviewProvider {
-    static var previews: some View {
-        ContentView().environment(\.managedObjectContext, PersistenceController.preview.container.viewContext)
+        return result
     }
 }

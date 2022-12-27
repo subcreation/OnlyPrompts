@@ -13,6 +13,13 @@
 		B2A6FC7F295A941600657AD9 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2A6FC7E295A941600657AD9 /* ContentView.swift */; };
 		B2A6FC81295A941700657AD9 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B2A6FC80295A941700657AD9 /* Assets.xcassets */; };
 		B2A6FC85295A941700657AD9 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B2A6FC84295A941700657AD9 /* Preview Assets.xcassets */; };
+		B2A6FC8C295A947F00657AD9 /* ModelData.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2A6FC8B295A947F00657AD9 /* ModelData.swift */; };
+		B2A6FC8E295A94B600657AD9 /* Prompt.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2A6FC8D295A94B600657AD9 /* Prompt.swift */; };
+		B2A6FC90295A950100657AD9 /* ImagePromptDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2A6FC8F295A950100657AD9 /* ImagePromptDetailView.swift */; };
+		B2A6FC96295A965000657AD9 /* CloseButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2A6FC95295A965000657AD9 /* CloseButton.swift */; };
+		B2A6FC99295A970D00657AD9 /* CloudKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B2A6FC98295A970D00657AD9 /* CloudKit.framework */; };
+		B2A6FC9B295A981100657AD9 /* Color+Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2A6FC9A295A981100657AD9 /* Color+Ext.swift */; };
+		B2A6FC9D295AB33400657AD9 /* ShuffleViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2A6FC9C295AB33400657AD9 /* ShuffleViewModel.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -24,6 +31,13 @@
 		B2A6FC80295A941700657AD9 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		B2A6FC82295A941700657AD9 /* OnlyPrompts.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = OnlyPrompts.entitlements; sourceTree = "<group>"; };
 		B2A6FC84295A941700657AD9 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		B2A6FC8B295A947F00657AD9 /* ModelData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelData.swift; sourceTree = "<group>"; };
+		B2A6FC8D295A94B600657AD9 /* Prompt.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Prompt.swift; sourceTree = "<group>"; };
+		B2A6FC8F295A950100657AD9 /* ImagePromptDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagePromptDetailView.swift; sourceTree = "<group>"; };
+		B2A6FC95295A965000657AD9 /* CloseButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloseButton.swift; sourceTree = "<group>"; };
+		B2A6FC98295A970D00657AD9 /* CloudKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CloudKit.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS16.2.sdk/System/Library/Frameworks/CloudKit.framework; sourceTree = DEVELOPER_DIR; };
+		B2A6FC9A295A981100657AD9 /* Color+Ext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Color+Ext.swift"; sourceTree = "<group>"; };
+		B2A6FC9C295AB33400657AD9 /* ShuffleViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShuffleViewModel.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -31,6 +45,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B2A6FC99295A970D00657AD9 /* CloudKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -42,6 +57,7 @@
 			children = (
 				B2A6FC76295A941600657AD9 /* OnlyPrompts */,
 				B2A6FC75295A941600657AD9 /* Products */,
+				B2A6FC97295A970C00657AD9 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -59,10 +75,16 @@
 				B2A6FC77295A941600657AD9 /* OnlyPromptsApp.swift */,
 				B2A6FC79295A941600657AD9 /* Persistence.swift */,
 				B2A6FC7E295A941600657AD9 /* ContentView.swift */,
+				B2A6FC8F295A950100657AD9 /* ImagePromptDetailView.swift */,
 				B2A6FC80295A941700657AD9 /* Assets.xcassets */,
 				B2A6FC82295A941700657AD9 /* OnlyPrompts.entitlements */,
 				B2A6FC7B295A941600657AD9 /* OnlyPrompts.xcdatamodeld */,
 				B2A6FC83295A941700657AD9 /* Preview Content */,
+				B2A6FC8B295A947F00657AD9 /* ModelData.swift */,
+				B2A6FC8D295A94B600657AD9 /* Prompt.swift */,
+				B2A6FC95295A965000657AD9 /* CloseButton.swift */,
+				B2A6FC9A295A981100657AD9 /* Color+Ext.swift */,
+				B2A6FC9C295AB33400657AD9 /* ShuffleViewModel.swift */,
 			);
 			path = OnlyPrompts;
 			sourceTree = "<group>";
@@ -73,6 +95,14 @@
 				B2A6FC84295A941700657AD9 /* Preview Assets.xcassets */,
 			);
 			path = "Preview Content";
+			sourceTree = "<group>";
+		};
+		B2A6FC97295A970C00657AD9 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				B2A6FC98295A970D00657AD9 /* CloudKit.framework */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -145,10 +175,16 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B2A6FC96295A965000657AD9 /* CloseButton.swift in Sources */,
 				B2A6FC78295A941600657AD9 /* OnlyPromptsApp.swift in Sources */,
+				B2A6FC90295A950100657AD9 /* ImagePromptDetailView.swift in Sources */,
+				B2A6FC8E295A94B600657AD9 /* Prompt.swift in Sources */,
 				B2A6FC7A295A941600657AD9 /* Persistence.swift in Sources */,
+				B2A6FC8C295A947F00657AD9 /* ModelData.swift in Sources */,
+				B2A6FC9D295AB33400657AD9 /* ShuffleViewModel.swift in Sources */,
 				B2A6FC7F295A941600657AD9 /* ContentView.swift in Sources */,
 				B2A6FC7D295A941600657AD9 /* OnlyPrompts.xcdatamodeld in Sources */,
+				B2A6FC9B295A981100657AD9 /* Color+Ext.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
