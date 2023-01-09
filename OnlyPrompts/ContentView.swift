@@ -9,107 +9,52 @@ import SwiftUI
 import CoreData
 
 struct ContentView: View {
-    @Environment(\.managedObjectContext) private var viewContext
-    @SwiftUI.Environment(\.presentationMode) private var presentationMode: Binding<PresentationMode>
-    @Environment(\.colorScheme) var colorScheme
-    @ObservedObject var viewModel: ShuffleViewModel
+    @FetchRequest(
+        sortDescriptors: [NSSortDescriptor(keyPath: \ActiveDay.date, ascending: false)],
+        animation: .default)
+    var usageHistory: FetchedResults<ActiveDay>
+    @ObservedObject var viewModel: ShuffleViewModel = ShuffleViewModel()
     
-    @State var selectedItem: ArtPrompt? = nil
-    private let columnWidth: CGFloat = 150.0
-    private let cornerRadius: CGFloat = 10.0
-    private let mosaicSpacing: CGFloat = 10.0
-    
-    @ViewBuilder
+    @State var selection: Int? = 1
+
     var body: some View {
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-            self.viewModel.shuffle()
-        }
-        
-        return ZStack {
-            ProgressView()
-                .opacity(cd_artPrompts.lists.count > 0 ? 0.0 : 1.0)
-            
-            GeometryReader { geo in
-                ScrollView {
-                    HStack(alignment: .top, spacing: mosaicSpacing) {
-                        ForEach((0..<Int(floor(geo.size.width / columnWidth))).reversed(), id: \.self) { c in
-                            LazyVStack(spacing: mosaicSpacing) {
-                                ForEach(getPromptsInColumns(by: Int(floor(geo.size.width / columnWidth)))[c]) { prompt in
-                                    AsyncImage(url: prompt.imageURL) { phase in
-                                        if let image = phase.image {
-                                            image
-                                                .resizable()
-                                                .scaledToFit()
-                                                .cornerRadius(cornerRadius)
-                                        } else if phase.error != nil {
-                                            ZStack {
-                                                Color.black
-                                                    .frame(height: columnWidth)
-                                                    .cornerRadius(cornerRadius)
-                                                Image(systemName: "exclamationmark.arrow.triangle.2.circlepath")
-                                                    .resizable()
-                                                    .scaledToFit()
-                                                    .frame(width: 30.0)
-                                                    .foregroundColor(.red)
-                                            }
-                                        } else {
-                                            ZStack {
-                                                Color.black
-                                                    .frame(height: columnWidth)
-                                                    .cornerRadius(cornerRadius)
-                                                ProgressView()
-                                            }
-                                        }
-                                    }
-                                    .onTapGesture {
-                                        selectedItem = prompt
-                                    }
-                                }
-                            }
+        if cd_artPrompts.lists.count > 0 {
+            return AnyView(
+                NavigationView {
+                    List {
+                        NavigationLink(destination: DashboardView(todaysImagePromptIndex: cd_artPrompts.lists.count == 0 ? 0 : getTodaysImagePromptIndex()), tag: 1, selection: $selection) {
+                            Label("Dashboard", systemImage: "speedometer")
                         }
-                    }
-                    .padding()
-                    .sheet(item: $selectedItem) { item in
-                        VStack {
-                            HStack {
-                                CloseButton()
-                                    .padding(16.0)
-                                    .onTapGesture {
-                                        withAnimation(.spring()) {
-                                            selectedItem = nil
-                                        }
-                                    }
-                                Spacer()
-                            }
-                            ImagePromptDetailView(action: { print("Placeholder action: navigate to new poem") }, artPrompt: item)
-                            #if os(macOS)
-                                .frame(width: (NSScreen.main?.visibleFrame.width ?? 1024.0) - 100.0, height: (NSScreen.main?.visibleFrame.height ?? 1024.0) - 100.0)
-                            #endif
-                            .background(colorScheme == .dark ? Color(hex: 0x000000, opacity: 0.3) : Color(hex: 0xFFFFFF, opacity: 0.3))
+                        NavigationLink(destination: ImagePromptsView(), tag: 2, selection: $selection) {
+                            Label("Prompts", systemImage: "photo")
                         }
+#if os(macOS)
+                        // work around for crash caused by lazy loading on macOS
+                        Text("\(cd_artPrompts.lists.count)")
+                            .foregroundColor(.secondary)
+                            .opacity(0.0)
+#endif
                     }
-                    .navigationTitle("Visual Prompts")
                 }
+            )
+        } else {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                reloadView()
             }
+            return AnyView(ProgressView())
         }
     }
     
-    func getPromptsInColumns(by column: Int) -> [[ArtPrompt]] {
-        var result: [[ArtPrompt]] = []
-        
-        for i in 0..<column {
-            var list: [ArtPrompt] = []
-            cd_artPrompts.lists.forEach { prompt in
-                let index = cd_artPrompts.lists.firstIndex { $0.id == prompt.id }
-                
-                if let index = index {
-                    if (index+1) % column == i {
-                        list.append(prompt)
-                    }
-                }
-            }
-            result.append(list)
-        }
-        return result
+    private func getTodaysImagePromptIndex() -> Int {
+        return getTotalDaysVerseOpened() % cd_artPrompts.lists.count
+    }
+    
+    private func getTotalDaysVerseOpened() -> Int {
+        let daysRequestedPrompt = usageHistory.filter { $0.requestedPrompt == true }
+        return daysRequestedPrompt.count
+    }
+    
+    func reloadView() {
+        self.viewModel.shuffle()
     }
 }

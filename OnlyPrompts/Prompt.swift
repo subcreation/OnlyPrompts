@@ -72,17 +72,19 @@ class CKPrompt {
                         case .failure(let error):
                             print("*** failure: \(error)")
                         case .success(let record):
-                            var artPrompt = ArtPrompt()
-                            
-                            let imageAsset = record["image"] as? CKAsset
-                            let imageURL = imageAsset?.fileURL
-                            
-                            artPrompt.recordID = recordID
-                            artPrompt.imageURL = imageURL
-                            artPrompt.credit = record["credit"] as! String
-                            //                    print("+++ credit: \(artPrompt.credit)")
-                            
-                            newPrompts.append(artPrompt)
+                            DispatchQueue.main.async {
+                                var artPrompt = ArtPrompt()
+                                
+                                let imageAsset = record["image"] as? CKAsset
+                                let imageURL = imageAsset?.fileURL
+                                
+                                artPrompt.recordID = recordID
+                                artPrompt.imageURL = imageURL
+                                artPrompt.credit = record["credit"] as! String
+                                //                    print("+++ credit: \(artPrompt.credit)")
+                                
+                                newPrompts.append(artPrompt)
+                            }
                         }
                     }
                     nextOperation.queryResultBlock = operation.queryResultBlock

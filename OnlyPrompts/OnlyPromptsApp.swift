@@ -9,12 +9,12 @@ import SwiftUI
 
 @main
 struct OnlyPromptsApp: App {
-    @ObservedObject var viewModel: ShuffleViewModel = ShuffleViewModel()
+//    @ObservedObject var viewModel: ShuffleViewModel = ShuffleViewModel()
     let persistenceController = PersistenceController.shared
 
     var body: some Scene {
         WindowGroup {
-            ContentView(viewModel: viewModel)
+            ContentView()//(viewModel: viewModel)
                 .environment(\.managedObjectContext, persistenceController.container.viewContext)
         }
     }
